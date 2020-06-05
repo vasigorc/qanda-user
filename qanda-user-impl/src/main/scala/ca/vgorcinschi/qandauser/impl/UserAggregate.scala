@@ -52,7 +52,7 @@ object UserBehavior {
         // Using Akka Persistence Typed in Lagom requires tagging your events
         // in Lagom-compatible way so Lagom ReadSideProcessors and TopicProducers
         // can locate and follow the event streams.
-        AkkaTaggerAdapter.fromLagom(entityContext, UserEvent.Tag)
+        AkkaTaggerAdapter.fromLagom(entityContext, OldUserEvent.Tag)
       )
 
   }
@@ -60,7 +60,7 @@ object UserBehavior {
    * This method is extracted to write unit tests that are completely independendant to Akka Cluster.
    */
   private[impl] def create(persistenceId: PersistenceId) = EventSourcedBehavior
-      .withEnforcedReplies[UserCommand, UserEvent, UserState](
+      .withEnforcedReplies[UserCommand, OldUserEvent, UserState](
         persistenceId = persistenceId,
         emptyState = UserState.initial,
         commandHandler = (cart, cmd) => cart.applyCommand(cmd),
@@ -72,22 +72,22 @@ object UserBehavior {
   * The current state of the Aggregate.
   */
 case class UserState(message: String, timestamp: String) {
-  def applyCommand(cmd: UserCommand): ReplyEffect[UserEvent, UserState] =
+  def applyCommand(cmd: UserCommand): ReplyEffect[OldUserEvent, UserState] =
     cmd match {
       case x: Hello              => onHello(x)
       case x: UseGreetingMessage => onGreetingMessageUpgrade(x)
     }
 
-  def applyEvent(evt: UserEvent): UserState =
+  def applyEvent(evt: OldUserEvent): UserState =
     evt match {
       case GreetingMessageChanged(msg) => updateMessage(msg)
     }
-  private def onHello(cmd: Hello): ReplyEffect[UserEvent, UserState] =
+  private def onHello(cmd: Hello): ReplyEffect[OldUserEvent, UserState] =
     Effect.reply(cmd.replyTo)(Greeting(s"$message, ${cmd.name}!"))
 
   private def onGreetingMessageUpgrade(
     cmd: UseGreetingMessage
-  ): ReplyEffect[UserEvent, UserState] =
+  ): ReplyEffect[OldUserEvent, UserState] =
     Effect
       .persist(GreetingMessageChanged(cmd.message))
       .thenReply(cmd.replyTo) { _ =>
@@ -128,18 +128,18 @@ object UserState {
 /**
   * This interface defines all the events that the QandauserAggregate supports.
   */
-sealed trait UserEvent extends AggregateEvent[UserEvent] {
-  def aggregateTag: AggregateEventTag[UserEvent] = UserEvent.Tag
+sealed trait OldUserEvent extends AggregateEvent[OldUserEvent] {
+  def aggregateTag: AggregateEventTag[OldUserEvent] = OldUserEvent.Tag
 }
 
-object UserEvent {
-  val Tag: AggregateEventTag[UserEvent] = AggregateEventTag[UserEvent]
+object OldUserEvent {
+  val Tag: AggregateEventTag[OldUserEvent] = AggregateEventTag[OldUserEvent]
 }
 
 /**
   * An event that represents a change in greeting message.
   */
-case class GreetingMessageChanged(message: String) extends UserEvent
+case class GreetingMessageChanged(message: String) extends OldUserEvent
 
 object GreetingMessageChanged {
 

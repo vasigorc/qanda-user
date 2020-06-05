@@ -63,12 +63,12 @@ class UserServiceImpl(
   override def greetingsTopic(): Topic[api.GreetingMessageChanged] =
     TopicProducer.singleStreamWithOffset { fromOffset =>
       persistentEntityRegistry
-        .eventStream(UserEvent.Tag, fromOffset)
+        .eventStream(OldUserEvent.Tag, fromOffset)
         .map(ev => (convertEvent(ev), ev.offset))
     }
 
   private def convertEvent(
-                            helloEvent: EventStreamElement[UserEvent]
+                            helloEvent: EventStreamElement[OldUserEvent]
                           ): api.GreetingMessageChanged = {
     helloEvent.event match {
       case GreetingMessageChanged(msg) =>
