@@ -31,7 +31,7 @@ trait UserService extends Service {
   def useGreeting(id: String): ServiceCall[GreetingMessage, Done]
 
 
-  def login(): ServiceCall[CredentialsPayload, NotUsed]
+  def login(): ServiceCall[CredentialsPayload, String]
 
   /**
     * This gets published to Kafka.
