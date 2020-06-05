@@ -111,7 +111,7 @@ object UserState {
     * namespaced under a typekey that specifies a name and also the type of the commands
     * that sharded actor can receive.
     */
-  val typeKey = EntityTypeKey[UserCommand]("QandauserAggregate")
+  val typeKey = EntityTypeKey[UserCommand]("UserAggregate")
 
   /**
     * Format for the hello state.
