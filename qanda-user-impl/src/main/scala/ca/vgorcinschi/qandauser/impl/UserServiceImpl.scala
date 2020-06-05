@@ -82,7 +82,7 @@ class UserServiceImpl(
         .fold(Future.successful("User name is required!")) {
           username =>
             val ref = persistentEntityRegistry.refFor[User](username.##.toString)
-            val reply = ref.ask(commands.Login(credentialsPayload))
+            val reply = ref.ask(commands.LoginCommand(credentialsPayload))
             reply.map(userId => userId.userUuid)
         }
   }
