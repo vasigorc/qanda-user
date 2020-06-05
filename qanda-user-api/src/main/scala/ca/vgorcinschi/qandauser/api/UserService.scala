@@ -3,6 +3,7 @@ package ca.vgorcinschi.qandauser.api
 import akka.{Done, NotUsed}
 import com.lightbend.lagom.scaladsl.api.broker.Topic
 import com.lightbend.lagom.scaladsl.api.broker.kafka.{KafkaProperties, PartitionKeyStrategy}
+import com.lightbend.lagom.scaladsl.api.transport.Method
 import com.lightbend.lagom.scaladsl.api.{Descriptor, Service, ServiceCall}
 import play.api.libs.json.{Format, Json}
 
@@ -30,6 +31,8 @@ trait UserService extends Service {
   def useGreeting(id: String): ServiceCall[GreetingMessage, Done]
 
 
+  def login(): ServiceCall[CredentialsPayload, NotUsed]
+
   /**
     * This gets published to Kafka.
     */
@@ -41,7 +44,8 @@ trait UserService extends Service {
     named("qanda-user")
       .withCalls(
         pathCall("/api/hello/:id", hello _),
-        pathCall("/api/hello/:id", useGreeting _)
+        pathCall("/api/hello/:id", useGreeting _),
+        restCall(Method.POST, "/api/users/login", login _)
       )
       .withTopics(
         topic(UserService.TOPIC_NAME, greetingsTopic _)
@@ -59,6 +63,17 @@ trait UserService extends Service {
     // @formatter:on
   }
 }
+
+object CredentialsPayload {
+  implicit val format: Format[CredentialsPayload] = Json.format[CredentialsPayload]
+}
+
+/**
+ * The credentials message class
+ * @param username - provided by user
+ * @param password - plaintext password provided by user
+ */
+case class CredentialsPayload(username: String, password: String)
 
 /**
   * The greeting message class.

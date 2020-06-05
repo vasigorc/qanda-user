@@ -1,7 +1,7 @@
 package ca.vgorcinschi.qandauser.impl
 
 import ca.vgorcinschi.qandauser.api
-import ca.vgorcinschi.qandauser.api.UserService
+import ca.vgorcinschi.qandauser.api.{CredentialsPayload, UserService}
 import akka.Done
 import akka.NotUsed
 import akka.cluster.sharding.typed.scaladsl.ClusterSharding
@@ -74,5 +74,9 @@ class UserServiceImpl(
       case GreetingMessageChanged(msg) =>
         api.GreetingMessageChanged(helloEvent.entityId, msg)
     }
+  }
+
+  override def login(): ServiceCall[CredentialsPayload, NotUsed] = {
+    credentialsPayload => ???
   }
 }
