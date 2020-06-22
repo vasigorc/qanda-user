@@ -5,6 +5,7 @@ import akka.cluster.sharding.typed.scaladsl.{ClusterSharding, EntityRef}
 import akka.util.Timeout
 import ca.vgorcinschi.qandauser.api
 import ca.vgorcinschi.qandauser.api.{CredentialsPayload, UserService}
+import ca.vgorcinschi.qandauser.impl.commands.UserCommand
 import ca.vgorcinschi.qandauser.impl.entities.User
 import com.lightbend.lagom.scaladsl.api.ServiceCall
 import com.lightbend.lagom.scaladsl.api.broker.Topic

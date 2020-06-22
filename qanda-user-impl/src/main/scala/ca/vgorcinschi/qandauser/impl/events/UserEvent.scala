@@ -28,5 +28,5 @@ object UserEvent {
   val Tag: AggregateEventShards[UserEvent] = AggregateEventTag.sharded[UserEvent](NumberOfShards)
 }
 
-final case class LoggedIn(userUuid: String) extends UserEvent
+final case class LoggedIn(userUuid: String, username: String) extends UserEvent
 final case class LoggedOut(userUuid: String) extends UserEvent

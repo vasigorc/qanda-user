@@ -98,32 +98,6 @@ case class UserState(message: String, timestamp: String) {
     copy(newMessage, LocalDateTime.now().toString)
 }
 
-object UserState {
-
-  /**
-    * The initial state. This is used if there is no snapshotted state to be found.
-    */
-  def initial: UserState = UserState("Hello", LocalDateTime.now.toString)
-
-  /**
-    * The [[EventSourcedBehavior]] instances (aka Aggregates) run on sharded actors inside the Akka Cluster.
-    * When sharding actors and distributing them across the cluster, each aggregate is
-    * namespaced under a typekey that specifies a name and also the type of the commands
-    * that sharded actor can receive.
-    */
-  val typeKey = EntityTypeKey[UserCommand]("UserAggregate")
-
-  /**
-    * Format for the hello state.
-    *
-    * Persisted entities get snapshotted every configured number of events. This
-    * means the state gets stored to the database, so that when the aggregate gets
-    * loaded, you don't need to replay all the events, just the ones since the
-    * snapshot. Hence, a JSON format needs to be declared so that it can be
-    * serialized and deserialized when storing to and from the database.
-    */
-  implicit val format: Format[UserState] = Json.format
-}
 
 /**
   * This interface defines all the events that the QandauserAggregate supports.
@@ -151,37 +125,6 @@ object GreetingMessageChanged {
     */
   implicit val format: Format[GreetingMessageChanged] = Json.format
 }
-
-/**
-  * This is a marker trait for commands.
-  * We will serialize them using Akka's Jackson support that is able to deal with the replyTo field.
-  * (see application.conf)
-  */
-trait UserCommandSerializable
-
-/**
-  * This interface defines all the commands that the QandauserAggregate supports.
-  */
-sealed trait UserCommand
-    extends UserCommandSerializable
-
-/**
-  * A command to switch the greeting message.
-  *
-  * It has a reply type of [[Confirmation]], which is sent back to the caller
-  * when all the events emitted by this command are successfully persisted.
-  */
-case class UseGreetingMessage(message: String, replyTo: ActorRef[Confirmation])
-    extends UserCommand
-
-/**
-  * A command to say hello to someone using the current greeting message.
-  *
-  * The reply type is String, and will contain the message to say to that
-  * person.
-  */
-case class Hello(name: String, replyTo: ActorRef[Greeting])
-    extends UserCommand
 
 final case class Greeting(message: String)
 
