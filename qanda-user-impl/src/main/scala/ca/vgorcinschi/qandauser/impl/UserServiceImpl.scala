@@ -6,7 +6,7 @@ import akka.util.Timeout
 import ca.vgorcinschi.qandauser.api
 import ca.vgorcinschi.qandauser.api.{CredentialsPayload, UserService}
 import ca.vgorcinschi.qandauser.impl.commands.UserCommand
-import ca.vgorcinschi.qandauser.impl.entities.User
+import ca.vgorcinschi.qandauser.impl.entities.UserEntity
 import com.lightbend.lagom.scaladsl.api.ServiceCall
 import com.lightbend.lagom.scaladsl.api.broker.Topic
 import com.lightbend.lagom.scaladsl.api.transport.BadRequest
@@ -25,7 +25,7 @@ class UserServiceImpl(
                      )(implicit ec: ExecutionContext)
   extends UserService {
 
-  persistentEntityRegistry.register(new User)
+  persistentEntityRegistry.register(new UserEntity)
 
   /**
    * Looks up the entity for the given ID.
@@ -82,8 +82,8 @@ class UserServiceImpl(
       Option(credentialsPayload.username)
         .fold(Future.successful("User name is required!")) {
           username =>
-            val ref = persistentEntityRegistry.refFor[User](username.##.toString)
-            val reply = ref.ask(commands.LoginCommand(credentialsPayload))
+            val ref = persistentEntityRegistry.refFor[UserEntity](username.##.toString)
+            val reply = ref.ask(commands.LogInCommand(credentialsPayload))
             reply.map(userId => userId.userUuid)
         }
   }

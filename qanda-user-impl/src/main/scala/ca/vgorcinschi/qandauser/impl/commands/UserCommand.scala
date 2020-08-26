@@ -10,11 +10,12 @@ sealed trait UserCommand
 object UserCommand {
 
   val serializers = Vector(
-    JsonSerializer(Json.format[LoginCommand]),
+    JsonSerializer(Json.format[LogInCommand]),
     JsonSerializer(Json.format[LoginCommandDone])
   )
 }
 
-final case class LoginCommand(content: CredentialsPayload) extends UserCommand with ReplyType[LoginCommandDone]
+final case class LogInCommand(content: CredentialsPayload) extends UserCommand with ReplyType[LoginCommandDone]
+case object LogOutCommand extends UserCommand with ReplyType[LoginCommandDone]
 
 final case class LoginCommandDone(userUuid: String)
